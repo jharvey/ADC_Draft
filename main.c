@@ -41,6 +41,27 @@ static adcsample_t sample_buff[MY_NUM_CH * MY_SAMPLING_NUMBER];
  * Mode:        Linear buffer, 10 samples of 1 channel, SW triggered.
  * Channels:    IN8
  */
+//static const ADCConversionGroup my_conversion_group = {
+//    .circular           = FALSE,
+//    .num_channels       = 1,
+//    .end_cb             = NULL,
+//    .error_cb           = NULL,
+//    /* HW dependent part below */
+//    .cr1                = 0,
+//    .cr2                = ADC_CR2_SWSTART,
+//    // sample times for channels 10...18
+//    .smpr1 = 0,
+//        //ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_144),   /* input16 - temperature sensor input on STM32F4xx */
+//    .smpr2 =
+//        ADC_SMPR2_SMP_AN8(ADC_SAMPLE_144),      /* input8 - analog input on STM32F4xx */
+//    .htr = 0,
+//    .ltr = 0,
+//    .sqr1 = 0,
+//    .sqr2 = 0,
+//    .sqr3 = ADC_SQR3_SQ1_N(8),
+//};
+
+
 static const ADCConversionGroup my_conversion_group = {
   FALSE,                            /*NOT CIRCULAR*/
   MY_NUM_CH,                        /*NUMB OF CH*/
@@ -54,7 +75,7 @@ static const ADCConversionGroup my_conversion_group = {
   0,                                /* LTR */
   ADC_SQR1_NUM_CH(MY_NUM_CH),       /* SQR1 */
   0,                                /* SQR2 */
-  ADC_SQR3_SQ2_N (ADC_CHANNEL_IN8)  /* SQR3 */
+  ADC_SQR3_SQ1_N (ADC_CHANNEL_IN8)  /* SQR3 */
 };
 
 
@@ -455,7 +476,7 @@ static THD_FUNCTION( Thread2, arg) {
       mean += sample_buff[ii];
     }
     mean /= MY_NUM_CH * MY_SAMPLING_NUMBER;
-    lastvalue = (float)mean * 3 / 4095;
+    lastvalue = (float)mean * 3.3 / 4095;
 
     jhprintf("Last value: %d.%03.d V \n", ftomod(lastvalue), ftodp(lastvalue));
 
@@ -479,6 +500,7 @@ int main(void) {
   // Set the analog input to be an analog input
   palSetPadMode(GPIOF, 10, PAL_MODE_INPUT_ANALOG);
   adcStart(&ADCD3, NULL);
+  adcSTM32EnableTSVREFE();
 
   jhprintf("Just booted Version 1\n");
 

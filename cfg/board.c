@@ -222,7 +222,7 @@ bool sdc_lld_is_card_inserted(SDCDriver *sdcp) {
 
   if (blkIsTransferring(sdcp))
     return last_status;
-  return last_status = (bool)palReadPad(GPIOC, GPIOC_SD_D3);
+  return last_status = (bool)palReadPad(GPIOC, GPIOC_PIN11_SD_D3);
 }
 
 /**
